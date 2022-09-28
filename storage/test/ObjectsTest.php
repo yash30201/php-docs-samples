@@ -372,40 +372,4 @@ EOF;
         $this->assertStringNotContainsString('Custom Time', $output);
         $this->assertStringNotContainsString('Retention Expiration Time', $output);
     }
-
-    public function testGetKMS()
-    {
-        $objectName = uniqid('get-kms-');
-        $bucket = self::$storage->bucket(self::$bucketName);
-        $object = $bucket->upload(self::$contents, [
-            'name' => $objectName,
-        ]);
-        $info = $object->reload();
-
-        $output = self::runFunctionSnippet('object_get_kms_key', [
-          self::$bucketName,
-          $objectName,
-        ]);
-
-        $expectedOutput = '';
-        if (array_key_exists('kmsKeyName', $info)) {
-          $expectedOutput = sprintf(
-            'The KMS key of the object is %s' . PHP_EOL,
-            $info['kmsKeyName'],
-          );
-        } else {
-          $expectedOutput = sprintf('KMS key not set' . PHP_EOL);
-        }
-
-        $dummyKmsKeyName = 'projects/dummy_project/locations/dummy_region/keyRings/dummy_ring/cryptoKeys/dummy_name';
-        $bucket->update([
-          'encryption' => [
-            'defaultKmsKeyName' => $dummyKmsKeyName
-          ]
-        ]);
-        $this->assertStringContainsString($expectedOutput , $output);
-
-        $object->delete();
-
-    }
 }

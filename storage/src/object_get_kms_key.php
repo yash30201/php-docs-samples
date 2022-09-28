@@ -39,15 +39,10 @@ function object_get_kms_key($bucketName, $objectName)
     $object = $bucket->object($objectName);
     $info = $object->info();
 
-    if (array_key_exists('kmsKeyName', $info)) {
-      printf(
-        'The KMS key of the object is %s' . PHP_EOL,
-        $info['kmsKeyName'],
-      );
-    }
-    else {
-      printf('KMS key not set' . PHP_EOL);
-    }
+    printf(
+      'The KMS key of the object is %s' . PHP_EOL,
+      $info['kmsKeyName'],
+    );
 }
 # [END storage_object_get_kms_key]
 

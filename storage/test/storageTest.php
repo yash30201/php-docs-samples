@@ -405,7 +405,7 @@ class storageTest extends TestCase
         ]);
     }
 
-    public function testEnableDefaultKmsKey()
+    public function testEnablePrintDefaultKmsKey()
     {
         $kmsEncryptedBucketName = self::$bucketName . '-kms-encrypted';
 
@@ -419,6 +419,26 @@ class storageTest extends TestCase
             $kmsEncryptedBucketName,
             $this->keyName()
         ));
+
+        $bucket = self::$storage->bucket($kmsEncryptedBucketName);
+        $objectName = 'test-object-' . time();
+        $object = $bucket->upload('content', ['name' => $objectName]);
+
+        $output = $this->runFunctionSnippet('object_get_kms_key', [
+          $kmsEncryptedBucketName,
+          $objectName,
+        ]);
+
+        $info = $object->info();
+        $this->assertEquals(
+          sprintf(
+            'The KMS key of the object is %s' . PHP_EOL,
+            $info['kmsKeyName'],
+          ),
+          $output,
+        );
+
+        $object->delete();
     }
 
     /** @depends testEnableDefaultKmsKey */
