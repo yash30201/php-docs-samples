@@ -22,6 +22,7 @@ use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\TestUtils\TestTrait;
 use Google\Cloud\TestUtils\EventuallyConsistentTestTrait;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 /**
  * Unit Tests for BigQuery snippets.
@@ -319,6 +320,19 @@ class FunctionsTest extends TestCase
         $this->assertStringContainsString('tempest', $output);
         $this->assertStringContainsString('kinghenryviii', $output);
         $this->assertStringContainsString('Found 42 row(s)', $output);
+    }
+
+    public function testAddColumnLoadAppend()
+    {
+        // Determine the snippet filename
+        $sampleName = 'add_column_load_append';
+        $tableId = $this->createTempTable();
+        $output = $this->runFunctionSnippet($sampleName, [
+          self::$datasetId,
+          $tableId
+        ]);
+        echo $output;
+        $this->assertEmpty($output);
     }
 
     private function runSnippet($sampleName, $params = [])
