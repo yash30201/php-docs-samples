@@ -66,8 +66,7 @@ function add_column_load_append(string $projectId, string $datasetId, string $ta
     $job = $bigQuery->runJob($loadConfig);
 
     if($job->isComplete()) {
-      $tableInfo = $table->info();
-      var_dump($tableInfo);
+      printf('Success');
     }
 
 }
