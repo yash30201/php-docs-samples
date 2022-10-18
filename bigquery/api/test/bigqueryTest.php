@@ -59,7 +59,7 @@ class FunctionsTest extends TestCase
     public function testBrowseTable()
     {
         $tableId = $this->createTempTable();
-        $output = $this->runSnippet('browse_table', [
+        $output = $this->runBigQuerySnippet('browse_table', [
             self::$datasetId,
             $tableId,
         ]);
@@ -72,7 +72,7 @@ class FunctionsTest extends TestCase
         $destinationTableId = sprintf('test_copy_table_%s', time());
 
         // run the import
-        $output = $this->runSnippet('copy_table', [
+        $output = $this->runBigQuerySnippet('copy_table', [
             self::$datasetId,
             $sourceTableId,
             $destinationTableId,
@@ -86,25 +86,25 @@ class FunctionsTest extends TestCase
     public function testCreateAndDeleteDataset()
     {
         $tempDatasetId = sprintf('test_dataset_%s', time());
-        $output = $this->runSnippet('create_dataset', [$tempDatasetId]);
+        $output = $this->runBigQuerySnippet('create_dataset', [$tempDatasetId]);
         $this->assertStringContainsString('Created dataset', $output);
 
         // delete the dataset
-        $output = $this->runSnippet('delete_dataset', [$tempDatasetId]);
+        $output = $this->runBigQuerySnippet('delete_dataset', [$tempDatasetId]);
         $this->assertStringContainsString('Deleted dataset', $output);
     }
 
     public function testCreateAndDeleteTable()
     {
         $tempTableId = sprintf('test_table_%s', time());
-        $output = $this->runSnippet('create_table', [
+        $output = $this->runBigQuerySnippet('create_table', [
             self::$datasetId,
             $tempTableId
         ]);
         $this->assertStringContainsString('Created table', $output);
 
         // delete the table
-        $output = $this->runSnippet('delete_table', [
+        $output = $this->runBigQuerySnippet('delete_table', [
             self::$datasetId,
             $tempTableId
         ]);
@@ -117,7 +117,7 @@ class FunctionsTest extends TestCase
         $tableId = $this->createTempTable();
 
         // run the import
-        $output = $this->runSnippet('extract_table', [
+        $output = $this->runBigQuerySnippet('extract_table', [
             self::$datasetId,
             $tableId,
             $bucketName
@@ -157,7 +157,7 @@ class FunctionsTest extends TestCase
         $tempTableId = $this->createTempEmptyTable();
 
         // run the import
-        $output = $this->runSnippet('import_from_local_csv', [
+        $output = $this->runBigQuerySnippet('import_from_local_csv', [
             self::$datasetId,
             $tempTableId,
             $source,
@@ -176,7 +176,7 @@ class FunctionsTest extends TestCase
         $tableId = sprintf('%s_%s', $snippet, rand());
 
         // run the import
-        $output = $this->runSnippet($snippet, [
+        $output = $this->runBigQuerySnippet($snippet, [
             self::$datasetId,
             $tableId,
         ]);
@@ -189,7 +189,7 @@ class FunctionsTest extends TestCase
 
         if ($runTruncateSnippet) {
             $truncateSnippet = sprintf('%s_truncate', $snippet);
-            $output = $this->runSnippet($truncateSnippet, [
+            $output = $this->runBigQuerySnippet($truncateSnippet, [
                 self::$datasetId,
                 $tableId,
             ]);
@@ -225,7 +225,7 @@ class FunctionsTest extends TestCase
         );
 
         // run the import
-        $output = $this->runSnippet('insert_sql', [
+        $output = $this->runBigQuerySnippet('insert_sql', [
             self::$datasetId,
             $tmpFile,
         ]);
@@ -237,14 +237,14 @@ class FunctionsTest extends TestCase
 
     public function testListDatasets()
     {
-        $output = $this->runSnippet('list_datasets');
+        $output = $this->runBigQuerySnippet('list_datasets');
         $this->assertStringContainsString(self::$datasetId, $output);
     }
 
     public function testListTables()
     {
         $tempTableId = $this->createTempEmptyTable();
-        $output = $this->runSnippet('list_tables', [self::$datasetId]);
+        $output = $this->runBigQuerySnippet('list_tables', [self::$datasetId]);
         $this->assertStringContainsString($tempTableId, $output);
     }
 
@@ -253,7 +253,7 @@ class FunctionsTest extends TestCase
         $tempTableId = $this->createTempEmptyTable();
 
         // run the import
-        $output = $this->runSnippet('stream_row', [
+        $output = $this->runBigQuerySnippet('stream_row', [
             self::$datasetId,
             $tempTableId,
             json_encode(['name' => 'Brent Shaffer', 'title' => 'Developer'])
@@ -269,7 +269,7 @@ class FunctionsTest extends TestCase
         $query = 'SELECT corpus, COUNT(*) as unique_words
             FROM `publicdata.samples.shakespeare` GROUP BY corpus LIMIT 10';
 
-        $output = $this->runSnippet('run_query', [$query]);
+        $output = $this->runBigQuerySnippet('run_query', [$query]);
         $this->assertStringContainsString('hamlet', $output);
         $this->assertStringContainsString('kinglear', $output);
         $this->assertStringContainsString('Found 10 row(s)', $output);
@@ -284,7 +284,7 @@ class FunctionsTest extends TestCase
             $tableId
         );
 
-        $output = $this->runSnippet('run_query_as_job', [$query]);
+        $output = $this->runBigQuerySnippet('run_query_as_job', [$query]);
         $this->assertStringContainsString('Found 1 row(s)', $output);
     }
 
@@ -297,7 +297,7 @@ class FunctionsTest extends TestCase
             $tableId
         );
 
-        $output = $this->runSnippet('dry_run_query', [$query]);
+        $output = $this->runBigQuerySnippet('dry_run_query', [$query]);
         $this->assertStringContainsString('This query will process 126 bytes', $output);
     }
 
@@ -310,13 +310,13 @@ class FunctionsTest extends TestCase
             $tableId
         );
 
-        $output = $this->runSnippet('query_no_cache', [$query]);
+        $output = $this->runBigQuerySnippet('query_no_cache', [$query]);
         $this->assertStringContainsString('Found 1 row(s)', $output);
     }
 
     public function testQueryLegacy()
     {
-        $output = $this->runSnippet('query_legacy');
+        $output = $this->runBigQuerySnippet('query_legacy');
         $this->assertStringContainsString('tempest', $output);
         $this->assertStringContainsString('kinghenryviii', $output);
         $this->assertStringContainsString('Found 42 row(s)', $output);
@@ -328,6 +328,7 @@ class FunctionsTest extends TestCase
         $sampleName = 'add_column_load_append';
         $tableId = $this->createTempTable();
         $output = $this->runFunctionSnippet($sampleName, [
+          self::$projectId,
           self::$datasetId,
           $tableId
         ]);
@@ -335,7 +336,7 @@ class FunctionsTest extends TestCase
         $this->assertEmpty($output);
     }
 
-    private function runSnippet($sampleName, $params = [])
+    private function runBigQuerySnippet($sampleName, $params = [])
     {
         $argv = array_merge([0, self::$projectId], $params);
         ob_start();
@@ -346,7 +347,7 @@ class FunctionsTest extends TestCase
     private function createTempEmptyTable()
     {
         $tempTableId = sprintf('test_table_%s_%s', time(), rand());
-        $this->runSnippet('create_table', [
+        $this->runBigQuerySnippet('create_table', [
             self::$datasetId,
             $tempTableId,
             json_encode([
@@ -361,7 +362,7 @@ class FunctionsTest extends TestCase
     {
         $tempTableId = $this->createTempEmptyTable();
         $source = __DIR__ . '/data/test_data.csv';
-        $output = $this->runSnippet('import_from_local_csv', [
+        $output = $this->runBigQuerySnippet('import_from_local_csv', [
             self::$datasetId,
             $tempTableId,
             $source,

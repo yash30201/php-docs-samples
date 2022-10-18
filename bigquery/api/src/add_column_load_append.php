@@ -57,7 +57,8 @@ function add_column_load_append(string $projectId, string $datasetId, string $ta
     //   'schemaUpdateOptions' => ['ALLOW_FIELD_ADDITION']
     // ];
 
-    $loadConfig = $table->load(fopen('../test/data/test_data_extra_column.csv', 'r'), )
+    $source = __DIR__ . '/../test/data/test_data_extra_column.csv';
+    $loadConfig = $table->load(fopen($source, 'r'), )
     ->destinationTable($table)->schema($schema)
     ->schemaUpdateOptions(['ALLOW_FIELD_ADDITION'])
     ->sourceFormat('CSV')
@@ -65,8 +66,10 @@ function add_column_load_append(string $projectId, string $datasetId, string $ta
 
     $job = $bigQuery->runJob($loadConfig);
 
-    if($job->isComplete()) {
-      printf('Success');
+    $columns = $table->info()['schema']['fields'];
+    printf('The columns in the table are ');
+    foreach ($columns as $column) {
+        printf('%s ', $column['name']);
     }
 
 }
